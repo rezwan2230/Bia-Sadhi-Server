@@ -27,7 +27,7 @@ async function run() {
     // await client.connect();
 
     const userCollection = client.db("biaSadhiDB").collection("users");
-    // const menuCollection = client.db("biaSadhiDB").collection("menu");
+    const bioDataCollection = client.db("biaSadhiDB").collection("biodata");
     // const reviewsCollection = client.db("biaSadhiDB").collection("reviews");
     // const cartCollection = client.db("biaSadhiDB").collection("carts");
     // const paymentCollection = client.db("biaSadhiDB").collection("payments");
@@ -39,34 +39,6 @@ async function run() {
       const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
       res.send({ token })
     })
-
-    //verift token
-    // const verifyToken = (req, res, next) => {
-    //   console.log('Inside verify Token', req.headers.authorization);
-    //   if (!req.headers.authorization) {
-    //     return res.status(401).send({ message: "unauthorized access" })
-    //   }
-    //   const token = req.headers.authorization.split(' ')[1]
-    //   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
-    //     if (err) {
-    //       return res.status(401).send({ message: "unauthorized access" })
-    //     }
-    //     req.decoded = decoded
-    //     next()
-    //   });
-    // }
-
-    //use verify admin after verify token
-    // const verifyAdmin = async (req, res, next) => {
-    //   const email = req.decoded.email
-    //   const query = { email: email }
-    //   const user = await userCollection.findOne(query);
-    //   const isAdmin = user?.role === 'admin'
-    //   if (!isAdmin) {
-    //     return res.status(403).send({ message: "forbidden access" })
-    //   }
-    //   next();
-    // }
 
 
 
@@ -164,6 +136,25 @@ async function run() {
       const result = await userCollection.updateOne(filter, premiumDoc);
       res.send(result);
     })
+
+
+    //Biodata related Api.
+
+    // create biodata with BiodataId.
+    app.post('/biodata/:email', async (req, res) => {
+      const userEmail = req.params.email
+      const bioDataForPreson = req.body;
+      const countStr = await bioDataCollection.countDocuments({ email: userEmail })
+      const count = parseInt(countStr)
+      const newData = {
+        ...bioDataForPreson, biodataID: parseInt(`${count + 1}`)
+      };
+      const result = await bioDataCollection.insertOne(newData);
+      res.send(result);
+    })
+
+
+
 
 
 
