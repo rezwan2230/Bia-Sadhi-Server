@@ -155,22 +155,61 @@ async function run() {
 
 
     //get specific biodata by email.
-    app.get('/biodata/:email', async(req, res)=>{
+    app.get('/biodata/:email', async (req, res) => {
       const email = req.params.email;
-      const query = {email : email}
+      const query = { email: email }
       const result = await bioDataCollection.find(query).toArray();
       res.send(result)
     })
 
-    
-     //delete specific biodata by id [Edit Biodata Page].
-     app.delete('/biodata/:id', async(req, res)=>{
+
+    //delete specific biodata by id [Edit Biodata Page].
+    app.delete('/biodata/:id', async (req, res) => {
       const id = req.params.id;
-      const query = {_id : new ObjectId(id)}
+      const query = { _id: new ObjectId(id) }
       const result = await bioDataCollection.deleteOne(query);
       res.send(result)
     })
 
+    //get specific biodata by id [Edit Single Biodata Page].
+    app.get('/biodatas/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await bioDataCollection.findOne(query);
+      res.send(result)
+    })
+
+
+    //update biodata 
+    app.put('/biodatas/:id', async (req, res) => {
+      const id = req.params.id
+      const updatedProduct = req.body
+      const filter = { _id: new ObjectId(id) }
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: {
+          name: updatedProduct.name,
+          age: updatedProduct.age,
+          dateofbirth: updatedProduct.dateofbirth,
+          gender: updatedProduct.gender,
+          height: updatedProduct.height,
+          weight: updatedProduct.weight,
+          occupation: updatedProduct.occupation,
+          photoURL: updatedProduct.photoURL,
+          FathersName: updatedProduct.FathersName,
+          mothersName: updatedProduct.mothersName,
+          race: updatedProduct.race,
+          ExpectedAge: updatedProduct.ExpectedAge,
+          ExpectedHeight: updatedProduct.ExpectedHeight,
+          ExpectedWeight: updatedProduct.ExpectedWeight,
+          presentDivision: updatedProduct.presentDivision,
+          permanentDivision: updatedProduct.permanentDivision,
+          mobileNo: updatedProduct.mobileNo
+        },
+      };
+      const result = await bioDataCollection.updateOne(filter, updateDoc, options);
+      res.send(result)
+    })
 
 
 
