@@ -154,6 +154,30 @@ async function run() {
     })
 
 
+    //get specific biodata by email.
+    app.get('/biodata/:email', async(req, res)=>{
+      const email = req.params.email;
+      const query = {email : email}
+      const result = await bioDataCollection.find(query).toArray();
+      res.send(result)
+    })
+
+    
+     //delete specific biodata by id [Edit Biodata Page].
+     app.delete('/biodata/:id', async(req, res)=>{
+      const id = req.params.id;
+      const query = {_id : new ObjectId(id)}
+      const result = await bioDataCollection.deleteOne(query);
+      res.send(result)
+    })
+
+
+
+
+
+
+
+
 
 
 
