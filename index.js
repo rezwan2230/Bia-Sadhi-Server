@@ -28,9 +28,7 @@ async function run() {
 
     const userCollection = client.db("biaSadhiDB").collection("users");
     const bioDataCollection = client.db("biaSadhiDB").collection("biodata");
-    // const reviewsCollection = client.db("biaSadhiDB").collection("reviews");
-    // const cartCollection = client.db("biaSadhiDB").collection("carts");
-    // const paymentCollection = client.db("biaSadhiDB").collection("payments");
+
 
 
     // jwt related  API
@@ -147,7 +145,7 @@ async function run() {
       const allCount = await bioDataCollection.countDocuments()
       const menCount = await bioDataCollection.countDocuments({ gender: 'male' })
       const femaleCount = await bioDataCollection.countDocuments({ gender: 'female' })
-      res.send({result, allCount, menCount, femaleCount })
+      res.send({ result, allCount, menCount, femaleCount })
     })
 
 
@@ -155,16 +153,37 @@ async function run() {
     app.get('/allBioData', async (req, res) => {
       const page = parseInt(req.query.page)
       const size = parseInt(req.query.size)
-      console.log('Pagination query : ',page, size);
+      console.log('Pagination query : ', page, size);
       const result = await bioDataCollection.find()
-      .skip(page*size)
-      .limit(size)
-      .toArray();
+        .skip(page * size)
+        .limit(size)
+        .toArray();
       res.send(result);
     })
 
-    
 
+    //get biodata by search
+    app.get('/biodataSearch', async (req, res) => {
+      let queryObject = {}
+      const name = req.query.name;
+      const permanentDivision = req.query.permanentDivision;
+      const male = req.query.male;
+      const female = req.query.female;
+      if (name) {
+        queryObject.name = { $regex: new RegExp('^' + name + '.*', 'i') };
+      }
+      if (male) {
+        queryObject.gender = male;
+      }
+      if (female) {
+        queryObject.gender = female;
+      }
+      if (permanentDivision) {
+        queryObject.permanentDivision = permanentDivision;
+      }
+      const result = await bioDataCollection.find(queryObject).toArray();
+      res.send(result);
+    });
 
 
 
@@ -238,10 +257,6 @@ async function run() {
       const result = await bioDataCollection.updateOne(filter, updateDoc, options);
       res.send(result)
     })
-
-
-
-
 
 
 
