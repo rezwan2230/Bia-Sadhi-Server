@@ -79,6 +79,7 @@ async function run() {
       res.send(result);
     })
 
+
     app.get('/users/admin/:email', verifyToken, async (req, res) => {
       const email = req.params.email;
       if (email !== req.decoded.email) {
@@ -139,6 +140,15 @@ async function run() {
 
 
     //Biodata related Api.
+
+    //get all biodata.
+    app.get('/biodatas', async (req, res) => {
+      const result = await bioDataCollection.find().toArray()
+      const allCount = await bioDataCollection.countDocuments()
+      const menCount = await bioDataCollection.countDocuments({ gender: 'male' })
+      const femaleCount = await bioDataCollection.countDocuments({ gender: 'female' })
+      res.send({result, allCount, menCount, femaleCount })
+    })
 
     // create biodata with BiodataId.
     app.post('/biodata/:email', async (req, res) => {
