@@ -28,6 +28,7 @@ async function run() {
 
     const userCollection = client.db("biaSadhiDB").collection("users");
     const bioDataCollection = client.db("biaSadhiDB").collection("biodata");
+    const favouriteCollection = client.db("biaSadhiDB").collection("favourites");
 
 
 
@@ -153,11 +154,7 @@ async function run() {
     app.get('/allBioData', async (req, res) => {
       const page = parseInt(req.query.page)
       const size = parseInt(req.query.size)
-      console.log('Pagination query : ', page, size);
-      const result = await bioDataCollection.find()
-        .skip(page * size)
-        .limit(size)
-        .toArray();
+      const result = await bioDataCollection.find().skip(page * size).limit(size).toArray();
       res.send(result);
     })
 
@@ -208,6 +205,15 @@ async function run() {
       const result = await bioDataCollection.find(query).toArray();
       res.send(result)
     })
+
+
+    //post biodata for Add to Favourites.
+    app.post('/addtofavourite', async(req, res)=>{
+      const favourite = req.body;
+      const result = await favouriteCollection.insertOne(favourite)
+      res.send(result)
+    })
+
 
 
     //delete specific biodata by id [Edit Biodata Page].
