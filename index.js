@@ -150,6 +150,24 @@ async function run() {
       res.send({result, allCount, menCount, femaleCount })
     })
 
+
+    //implement pagination
+    app.get('/allBioData', async (req, res) => {
+      const page = parseInt(req.query.page)
+      const size = parseInt(req.query.size)
+      console.log('Pagination query : ',page, size);
+      const result = await bioDataCollection.find()
+      .skip(page*size)
+      .limit(size)
+      .toArray();
+      res.send(result);
+    })
+
+    
+
+
+
+
     // create biodata with BiodataId.
     app.post('/biodata/:email', async (req, res) => {
       const userEmail = req.params.email
