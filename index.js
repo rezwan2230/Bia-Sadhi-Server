@@ -3,6 +3,7 @@ var cors = require('cors')
 const app = express()
 require('dotenv').config()
 var jwt = require('jsonwebtoken');
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const port = process.env.PORT || 5000;
 
 app.use(express.json())
@@ -29,7 +30,6 @@ async function run() {
     const userCollection = client.db("biaSadhiDB").collection("users");
     const bioDataCollection = client.db("biaSadhiDB").collection("biodata");
     const favouriteCollection = client.db("biaSadhiDB").collection("favourites");
-
 
 
     // jwt related  API
@@ -183,7 +183,6 @@ async function run() {
     });
 
 
-
     // create biodata with BiodataId.
     app.post('/biodata/:email', async (req, res) => {
       const userEmail = req.params.email
@@ -207,16 +206,16 @@ async function run() {
     })
 
     //get favourites biodata by specific email.
-    app.get('/addtofavourite/:email', async(req, res)=>{
+    app.get('/addtofavourite/:email', async (req, res) => {
       const email = req.params.email;
-      const query = {email : email}
+      const query = { email: email }
       const result = await favouriteCollection.find(query).toArray()
       res.send(result)
     })
 
 
     //post biodata for Add to Favourites.
-    app.post('/addtofavourite', async(req, res)=>{
+    app.post('/addtofavourite', async (req, res) => {
       const favourite = req.body;
       const result = await favouriteCollection.insertOne(favourite)
       res.send(result)
@@ -279,6 +278,34 @@ async function run() {
       const result = await bioDataCollection.updateOne(filter, updateDoc, options);
       res.send(result)
     })
+
+
+    //Check user is male or female
+    app.get('/user/:email', async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email }
+      const user = await bioDataCollection.findOne(query)
+      const gender = user?.gender === 'male'
+      res.send({ gender })
+    })
+
+
+
+
+    //Payment Related API
+    app.post("/create-payment-intent", async (req, res) => {
+      const { price } = req.body;
+      const amount = parseInt(price * 100)
+      console.log(amount, 'amount inside the intent');
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: amount,
+        currency: "usd",
+        payment_method_types: ["card"],
+      });
+      res.send({
+        clientSecret: paymentIntent.client_secret,
+      });
+    });
 
 
 
