@@ -206,11 +206,27 @@ async function run() {
       res.send(result)
     })
 
+    //get favourites biodata by specific email.
+    app.get('/addtofavourite/:email', async(req, res)=>{
+      const email = req.params.email;
+      const query = {email : email}
+      const result = await favouriteCollection.find(query).toArray()
+      res.send(result)
+    })
+
 
     //post biodata for Add to Favourites.
     app.post('/addtofavourite', async(req, res)=>{
       const favourite = req.body;
       const result = await favouriteCollection.insertOne(favourite)
+      res.send(result)
+    })
+
+    //delete specific favourite item by id.
+    app.delete('/addtofavourite/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await favouriteCollection.deleteOne(query);
       res.send(result)
     })
 
