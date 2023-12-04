@@ -30,6 +30,7 @@ async function run() {
     const userCollection = client.db("biaSadhiDB").collection("users");
     const bioDataCollection = client.db("biaSadhiDB").collection("biodata");
     const favouriteCollection = client.db("biaSadhiDB").collection("favourites");
+    const paymentCollection = client.db("biaSadhiDB").collection("payments");
 
 
     // jwt related  API
@@ -306,6 +307,38 @@ async function run() {
         clientSecret: paymentIntent.client_secret,
       });
     });
+
+    //payment related api for users
+    app.post('/payments', async (req, res) => {
+      const payment = req.body
+      const paymentResult = await paymentCollection.insertOne(payment)
+      res.send({ paymentResult})
+    })
+
+    app.get('/payments/:email', async (req, res) => {
+      const email = req.params.email;
+      const query = {email : email}
+      const paymentResult = await paymentCollection.find(query).toArray()
+      res.send(paymentResult)
+    })
+
+    app.get('/payments/:email', async (req, res) => {
+      const email = req.params.email;
+      const query = {email : email}
+      const paymentResult = await paymentCollection.find(query).toArray()
+      res.send(paymentResult)
+    })
+
+    app.delete('/contact/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await paymentCollection.deleteOne(query);
+      res.send(result)
+    })
+
+
+
+
 
 
 
