@@ -73,7 +73,7 @@ async function run() {
 
     //USER RELATED API
     app.get('/users', verifyToken, verifyAdmin, async (req, res) => {
-      console.log(req.headers);
+      // console.log(req.headers);
       const result = await userCollection.find().toArray();
       res.send(result);
     })
@@ -293,7 +293,7 @@ async function run() {
     app.post("/create-payment-intent", async (req, res) => {
       const { price } = req.body;
       const amount = parseInt(price * 100)
-      console.log(amount, 'amount inside the intent');
+      // console.log(amount, 'amount inside the intent');
       const paymentIntent = await stripe.paymentIntents.create({
         amount: amount,
         currency: "usd",
@@ -355,11 +355,20 @@ async function run() {
       res.send(result)
     })
 
-
-
-
-
-
+    
+    app.get('/getsixbioData', async (req, res) => {
+      let queryObject = {}
+      let sortObject = {}
+      const sortField = req.query.sortField
+      const sortOrder = parseInt(req.query.sortOrder)
+    
+      if (sortField === 'age') {
+        sortObject[sortField] = sortOrder;
+      }
+    
+      const result = await bioDataCollection.find(queryObject).limit(6).sort(sortObject).toArray();
+      res.send(result);
+    });
 
 
 
