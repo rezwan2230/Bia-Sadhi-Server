@@ -71,7 +71,6 @@ async function run() {
     }
 
 
-
     //USER RELATED API
     app.get('/users', verifyToken, verifyAdmin, async (req, res) => {
       console.log(req.headers);
@@ -231,7 +230,6 @@ async function run() {
     })
 
 
-
     //delete specific biodata by id [Edit Biodata Page].
     app.delete('/biodata/:id', async (req, res) => {
       const id = req.params.id;
@@ -281,18 +279,6 @@ async function run() {
     })
 
 
-    //Check user is male or female
-    app.get('/user/:email', async (req, res) => {
-      const email = req.params.email;
-      const query = { email: email }
-      const user = await bioDataCollection.findOne(query)
-      const gender = user?.gender === 'male'
-      res.send({ gender })
-    })
-
-
-
-
     //Payment Related API
     app.post("/create-payment-intent", async (req, res) => {
       const { price } = req.body;
@@ -307,6 +293,29 @@ async function run() {
         clientSecret: paymentIntent.client_secret,
       });
     });
+
+
+    //payment related api for admin.
+    app.get('/allpayment', async(req, res)=>{
+      const result = await paymentCollection.find().toArray()
+      res.send(result)
+    })
+
+
+    //approve contact request
+    app.patch('/users/admin/approveRequest/:id', verifyToken, verifyAdmin, async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) }
+      const approveDoc = {
+        $set: {
+          status: 'approve'
+        },
+      };
+      const result = await paymentCollection.updateOne(filter, approveDoc);
+      res.send(result);
+    })
+
+
 
     //payment related api for users
     app.post('/payments', async (req, res) => {
@@ -334,6 +343,12 @@ async function run() {
       const query = { _id: new ObjectId(id) }
       const result = await paymentCollection.deleteOne(query);
       res.send(result)
+    })
+
+
+    //admin home
+    app.get('/admin-stats', async(req, res)=>{
+      
     })
 
 
