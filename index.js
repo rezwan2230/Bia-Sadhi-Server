@@ -137,6 +137,16 @@ async function run() {
       res.send(result);
     })
 
+    //admin home
+    app.get('/admin-stats', async (req, res) => {
+      const totalBioData = await bioDataCollection.countDocuments()
+      const maleBioData = await bioDataCollection.countDocuments({ gender: 'male' })
+      const femaleBioData = await bioDataCollection.countDocuments({ gender: 'female' })
+      const paymentData = await paymentCollection.find().toArray();
+      const totalPayment = paymentData.reduce((accumulator, current) => accumulator + current.price, 0)
+      res.send({ totalBioData, maleBioData, femaleBioData, totalPayment })
+    })
+
 
     //Biodata related Api.
 
@@ -296,7 +306,7 @@ async function run() {
 
 
     //payment related api for admin.
-    app.get('/allpayment', async(req, res)=>{
+    app.get('/allpayment', async (req, res) => {
       const result = await paymentCollection.find().toArray()
       res.send(result)
     })
@@ -321,19 +331,19 @@ async function run() {
     app.post('/payments', async (req, res) => {
       const payment = req.body
       const paymentResult = await paymentCollection.insertOne(payment)
-      res.send({ paymentResult})
+      res.send({ paymentResult })
     })
 
     app.get('/payments/:email', async (req, res) => {
       const email = req.params.email;
-      const query = {email : email}
+      const query = { email: email }
       const paymentResult = await paymentCollection.find(query).toArray()
       res.send(paymentResult)
     })
 
     app.get('/payments/:email', async (req, res) => {
       const email = req.params.email;
-      const query = {email : email}
+      const query = { email: email }
       const paymentResult = await paymentCollection.find(query).toArray()
       res.send(paymentResult)
     })
@@ -343,12 +353,6 @@ async function run() {
       const query = { _id: new ObjectId(id) }
       const result = await paymentCollection.deleteOne(query);
       res.send(result)
-    })
-
-
-    //admin home
-    app.get('/admin-stats', async(req, res)=>{
-      
     })
 
 
